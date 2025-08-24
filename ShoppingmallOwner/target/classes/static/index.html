@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Owner - Shop Management</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #090979; padding: 20px; }
+        .container { background: white; padding: 20px; border-radius: 8px; max-width: 600px; margin: auto; }
+        input, button { width: 95%; padding: 10px; margin: 5px 0; }
+        button { background-color: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Manage Shops</h2>
+        <input type="text" id="shopName" placeholder="Shop Name">
+        <input type="text" id="ownerName" placeholder="Owner Name">
+        <input type="text" id="category" placeholder="Category">
+        <input type="text" id="contactInfo" placeholder="Contact Info">
+        <button onclick="addShop()">Add Shop</button>
+        <div id="shopList"></div>
+    </div>
+
+    <script>
+    	const apiurl = 'http://localhost:8081/api/shops';
+        
+
+        function fetchShops() {
+            fetch(apiurl)
+                .then(response => response.json())
+                .then(data => {
+                    const shopList = document.getElementById('shopList');
+                    shopList.innerHTML = '<h3>Shop List:</h3>';
+                    data.forEach(shop => {
+                        shopList.innerHTML += `<p>${shop.name} - Owner: ${shop.ownerName} <button onclick = "deleteShop(${shop.id})">Delete</button></p>`;
+                    });
+                });
+        }
+        function addShop() {
+        	const shop={
+             name : document.getElementById('shopName').value,
+             ownerName : document.getElementById('ownerName').value,
+             category : document.getElementById('category').value,
+             contactInfo : document.getElementById('contactInfo').value,
+        	}
+            fetch(apiurl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(shop)
+            })
+            .then(()=> fetchShops());
+        }
+        
+        function deleteShop(id){
+        	fetch(`${apiurl}/${id}`,{method:'DELETE'})
+        	.then(()=>fetchShops());
+        }
+
+        fetchShops();
+    </script>
+</body>
+</html>
